@@ -25,6 +25,5 @@ spec:
             subPath: nginx.conf
       volumes:
       - name: nginx-config
-        emptyDir: {}
         configMap:
           name: nginx-map
