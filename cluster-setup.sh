@@ -8,6 +8,12 @@ else
 	exit 1
 fi
 
+if kubectl create -f fluffy.yaml ; then
+	echo "Namespace Created."
+else
+	echo "Namespace probably already exists. Lets just see how things go."
+fi
+
 if kubectl create -f ./proxy/n_svc.yaml ; then
 	echo "Proxy Service Configured."
 else
@@ -44,8 +50,16 @@ else
 	kubectl delete pods es-cluster
 	echo "Elastic Pods failed."
 	exit 1
+fi
 
 if kubectl create -f kibana/kibana.yaml ; then
+	echo "Success!"
+else
 	kubectl delete pods kibana
 	echo "kibana failed"
 	exit 1
+fi
+kubectl rollout status sts/es-cluster --namespace=fluffy
+kubectl rollout status deployment/kibana --namespace=fluffy
+
+echo "You've reached the end of this script. I can help you no further."
