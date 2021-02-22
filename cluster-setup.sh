@@ -52,6 +52,13 @@ else
 	exit 1
 fi
 
+if kubectl create -f kibana/k_svc.yaml ; then
+	echo "Made the Kibana service"
+else
+	kubectl delete service kibana
+	echo "kibana service failed"
+	exit 1
+fi
 if kubectl create -f kibana/kibana.yaml ; then
 	echo "Success!"
 else
