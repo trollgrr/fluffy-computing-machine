@@ -22,7 +22,7 @@ else
 	exit 1
 fi
 
-if kubectl create configmap nginx-map --from-file=./proxy/config/nginx.conf ; then
+if kubectl create configmap nginx-map --from-file=./proxy/config/nginx.conf --namespace=fluffy; then
 	echo "Config Map Configged."
 else
 	echo "Config Map Conflagration."
