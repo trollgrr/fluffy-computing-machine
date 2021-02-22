@@ -29,6 +29,11 @@ else
 	kubectl delete configmap nginx-map
 	exit 1
 fi
+
+echo "lets wait a tick for pods to spin up"
+sleep 10
+echo "should be good enough"
+
 if kubectl create -f proxy/nginx.yaml ; then
 	echo "Proxy Created"
 else
@@ -68,5 +73,6 @@ else
 fi
 kubectl rollout status sts/es-cluster --namespace=fluffy
 kubectl rollout status deployment/kibana --namespace=fluffy
+kubectl describe pods --namespace=fluffy
 
 echo "You've reached the end of this script. I can help you no further."
