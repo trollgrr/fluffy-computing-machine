@@ -22,7 +22,7 @@ else
 	exit 1
 fi
 
-if kubectl create configmap nginx-map --from-file=./proxy/config/nginx.conf --namespace=fluffy; then
+if kubectl create configmap nginx-config --from-file=./proxy/nginx-config.yaml --namespace=fluffy ; then
 	echo "Config Map Configged."
 else
 	echo "Config Map Conflagration."
@@ -73,6 +73,7 @@ else
 fi
 kubectl rollout status sts/es-cluster --namespace=fluffy
 kubectl rollout status deployment/kibana --namespace=fluffy
+sleep 10
 kubectl describe pods --namespace=fluffy
 
 echo "You've reached the end of this script. I can help you no further."
