@@ -1,0 +1,3 @@
+[submodule "proxy/nginx"]
+	path = proxy/nginx
+	url = https://github.com/nginxinc/kubernetes-ingress/
