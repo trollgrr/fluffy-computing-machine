@@ -1,46 +1,40 @@
 #!/bin/bash
 # This should get your cluster configured and deployed, or at least tell you where it went wrong
 kind delete cluster
+rm -rf proxy/nginx
+git rm -r --cached proxy/nginx
+git submodule add --force https://github.com/nginxinc/kubernetes-ingress/ proxy/nginx
+git -C proxy/nginx checkout v1.10.0
+
 if kind create cluster --config=./kind-config.yaml ; then
 	echo "Cluster created"
 else
 	echo "Cluster failed. Sorry, but check the instance setup script."
+        kind delete cluster
 	exit 1
 fi
 
+kubectl apply -f proxy/nginx/deployments/common/ns-and-sa.yaml
+kubectl apply -f proxy/nginx/deployments/rbac/rbac.yaml
+kubectl apply -f proxy/nginx/deployments/common/default-server-secret.yaml
+kubectl apply -f proxy/nginx/deployments/common/ingress-class.yaml
+kubectl apply -f proxy/nginx/deployments/common/crds/k8s.nginx.org_virtualservers.yaml
+kubectl apply -f proxy/nginx/deployments/deployment/nginx-ingress.yaml
+echo "ingress should be starting, give it a tick to get ready"
+sleep 10
+kubectl get pods --namespace=nginx-ingress
+kubectl create -f proxy/nginx/deployments/service/nodeport.yaml
+echo "To access the Ingress controller, use an IP address of any node of the cluster along with the two allocated ports."
+kubectl create -f virtual.yaml
 if kubectl create -f fluffy.yaml ; then
 	echo "Namespace Created."
 else
 	echo "Namespace probably already exists. Lets just see how things go."
 fi
 
-if kubectl create -f ./proxy/n_svc.yaml ; then
-	echo "Proxy Service Configured."
-else
-	echo "Proxy Service failed."
-	kubectl delete service nginx
-	exit 1
-fi
-
-if kubectl create configmap nginx-config --from-file=./proxy/nginx-config.yaml --namespace=fluffy ; then
-	echo "Config Map Configged."
-else
-	echo "Config Map Conflagration."
-	kubectl delete configmap nginx-map
-	exit 1
-fi
-
-echo "lets wait a tick for pods to spin up"
+echo "lets wait a tick for cluster pods to spin up"
 sleep 10
 echo "should be good enough"
-
-if kubectl create -f proxy/nginx.yaml ; then
-	echo "Proxy Created"
-else
-	echo "Proxy Failed!"
-	kubectl delete pods nginx
-	exit 1
-fi
 
 if kubectl create -f elasticsearch/e_svc.yaml ; then
 	echo "ElasticService Created"

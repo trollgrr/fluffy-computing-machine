@@ -1,0 +1,13 @@
+apiVersion: k8s.nginx.org/v1
+kind: VirtualServer
+metadata:
+  name: fluffyvs
+  namespace: fluffy
+spec:
+  host: localhost
+  tls:
+    secret: kibana-secret
+  upstreams:
+  - name: kibana
+    service: kibana-svc
+    port: 9200
