@@ -10,4 +10,4 @@ spec:
   upstreams:
   - name: kibana
     service: kibana-svc
-    port: 9200
+    port: 5601
